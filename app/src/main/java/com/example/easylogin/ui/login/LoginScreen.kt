@@ -46,16 +46,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.easylogin.R
+import com.example.easylogin.viewmodel.LoginViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(){
-    val userName = remember {
-        mutableStateOf("")
-    }
-    val password = remember {
-        mutableStateOf("")
-    }
+    val loginViewModel: LoginViewModel = viewModel()
     val focusManager = LocalFocusManager.current
     val passwordVisible = remember { mutableStateOf(false) }
     Scaffold (
@@ -108,9 +105,9 @@ fun LoginScreen(){
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 OutlinedTextField(
-                    value = userName.value,
+                    value = loginViewModel.userName.value,
                     onValueChange = {
-                        userName.value = it
+                        loginViewModel.userName.value = it
                     },
                     label = { Text(text = "Username") },
                     modifier = Modifier.fillMaxWidth(),
@@ -122,11 +119,18 @@ fun LoginScreen(){
                         onNext = { focusManager.moveFocus(FocusDirection.Down) }
                     )
                 )
+                loginViewModel.usernameError.value?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.height(12.dp))
                 OutlinedTextField(
-                    value = password.value,
+                    value = loginViewModel.password.value,
                     onValueChange = {
-                        password.value = it
+                        loginViewModel.password.value = it
                     },
                     label = { Text(text = "Password") },
                     modifier = Modifier.fillMaxWidth(),
@@ -154,9 +158,20 @@ fun LoginScreen(){
                         onNext = { focusManager.clearFocus() }
                     ),
                 )
+                loginViewModel.passwordError.value?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        if (loginViewModel.validateFields()) {
+                            
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF219FF3)
