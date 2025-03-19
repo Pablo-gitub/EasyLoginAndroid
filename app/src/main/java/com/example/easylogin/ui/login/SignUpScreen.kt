@@ -16,13 +16,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -42,33 +46,35 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.easylogin.R
-import com.example.easylogin.viewmodel.LoginViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.easylogin.R
 import com.example.easylogin.ui.theme.EasyLoginTheme
+import com.example.easylogin.viewmodel.SignUpViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavHostController){
-    val loginViewModel: LoginViewModel = viewModel()
+fun SignUpScreen(navController: NavHostController){
+    val SignUpViewModel: SignUpViewModel = viewModel()
     val focusManager = LocalFocusManager.current
     val passwordVisible = remember { mutableStateOf(false) }
-    val snackBarHostState = remember { androidx.compose.material3.SnackbarHostState() }
+    val repetitionPasswordVisible = remember { mutableStateOf(false) }
+    val snackBarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(key1 = loginViewModel.loginMessage.value) {
-        loginViewModel.loginMessage.value?.let { message ->
+    LaunchedEffect(key1 = SignUpViewModel.SignUpMessage.value) {
+        SignUpViewModel.SignUpMessage.value?.let { message ->
             snackBarHostState.showSnackbar(message)
-            loginViewModel.loginMessage.value = null
+            SignUpViewModel.SignUpMessage.value = null
         }
     }
 
     Scaffold (
-        snackbarHost = { CustomSnackbarHost(hostState = snackBarHostState, isSuccess = loginViewModel.isLoginSuccess.value) },
+        snackbarHost = { CustomSnackbarHost(hostState = snackBarHostState, isSuccess = SignUpViewModel.isSignUpSuccess.value) },
         topBar = {
             TopAppBar(
                 modifier = Modifier.clip(RoundedCornerShape(bottomStart = 80.dp, bottomEnd = 80.dp)),
@@ -84,7 +90,7 @@ fun LoginScreen(navController: NavHostController){
                     containerColor = Color(0xFF219FF3)
                 ),
 
-            )
+                )
         }
     ){ innerPadding ->
         Box(
@@ -109,7 +115,7 @@ fun LoginScreen(navController: NavHostController){
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
-                    text = "Login Screen",
+                    text = "Registration Screen",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.fillMaxWidth(),
@@ -118,9 +124,9 @@ fun LoginScreen(navController: NavHostController){
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 OutlinedTextField(
-                    value = loginViewModel.userName.value,
+                    value = SignUpViewModel.userName.value,
                     onValueChange = {
-                        loginViewModel.userName.value = it
+                        SignUpViewModel.userName.value = it
                     },
                     label = { Text(text = "Username") },
                     modifier = Modifier.fillMaxWidth(),
@@ -132,7 +138,7 @@ fun LoginScreen(navController: NavHostController){
                         onNext = { focusManager.moveFocus(FocusDirection.Down) }
                     )
                 )
-                loginViewModel.usernameError.value?.let { error ->
+                SignUpViewModel.usernameError.value?.let { error ->
                     Text(
                         text = error,
                         color = Color.Red,
@@ -141,27 +147,66 @@ fun LoginScreen(navController: NavHostController){
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 OutlinedTextField(
-                    value = loginViewModel.password.value,
+                    value = SignUpViewModel.password.value,
                     onValueChange = {
-                        loginViewModel.password.value = it
+                        SignUpViewModel.password.value = it
                     },
                     label = { Text(text = "Password") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     visualTransformation = if (passwordVisible.value) {
-                        androidx.compose.ui.text.input.VisualTransformation.None
+                        VisualTransformation.None
                     } else {
                         PasswordVisualTransformation()
                     },
                     trailingIcon = {
                         val image = if (passwordVisible.value)
-                            androidx.compose.material.icons.Icons.Filled.Visibility
+                            Icons.Filled.Visibility
                         else
-                            androidx.compose.material.icons.Icons.Filled.VisibilityOff
+                            Icons.Filled.VisibilityOff
 
                         val description = if (passwordVisible.value) "Hide password" else "Show password"
-                        androidx.compose.material3.IconButton(onClick = { passwordVisible.value = !passwordVisible.value }) {
-                            androidx.compose.material3.Icon(imageVector = image, contentDescription = description)
+                        IconButton(onClick = { passwordVisible.value = !passwordVisible.value }) {
+                            Icon(imageVector = image, contentDescription = description)
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                    ),
+                )
+                SignUpViewModel.passwordError.value?.let { error ->
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = SignUpViewModel.repetitionPassword.value,
+                    onValueChange = {
+                        SignUpViewModel.repetitionPassword.value = it
+                    },
+                    label = { Text(text = "Repeat Password") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    visualTransformation = if (repetitionPasswordVisible.value) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
+                    trailingIcon = {
+                        val image = if (repetitionPasswordVisible.value)
+                            Icons.Filled.Visibility
+                        else
+                            Icons.Filled.VisibilityOff
+
+                        val description = if (repetitionPasswordVisible.value) "Hide password repetition" else "Show password repetition"
+                        IconButton(onClick = { repetitionPasswordVisible.value = !repetitionPasswordVisible.value }) {
+                            Icon(imageVector = image, contentDescription = description)
                         }
                     },
                     keyboardOptions = KeyboardOptions.Default.copy(
@@ -171,7 +216,7 @@ fun LoginScreen(navController: NavHostController){
                         onNext = { focusManager.clearFocus() }
                     ),
                 )
-                loginViewModel.passwordError.value?.let { error ->
+                SignUpViewModel.repetitionPasswordError.value?.let { error ->
                     Text(
                         text = error,
                         color = Color.Red,
@@ -181,17 +226,16 @@ fun LoginScreen(navController: NavHostController){
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = {
-                        if (loginViewModel.authenticate()) {
-
+                        if (SignUpViewModel.authenticate()) {
+                            navController.navigate("login")
                         }
-                        loginViewModel.authenticate()
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF219FF3)
                     )
                 ) {
-                    Text(text = "Login", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(text = "Sign Up", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                 }
                 Row (
                     modifier = Modifier
@@ -199,11 +243,11 @@ fun LoginScreen(navController: NavHostController){
                         .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.Center
                 ){
-                    Text(text = "Don't you have an account, ")
-                    Text(text = "Sign-up!",
+                    Text(text = "Do you already have an account, ")
+                    Text(text = "Login!",
                         color = Color(0xFF219FF3),
                         modifier = Modifier.clickable {
-                            navController.navigate("sign-up")
+                            navController.navigate("login")
                         }
                     )
                 }
@@ -212,11 +256,11 @@ fun LoginScreen(navController: NavHostController){
     }
 }
 
-@Preview (showBackground = true)
+@Preview(showBackground = true)
 @Composable
-fun LogicScreenPreview(){
+fun SignUpScreenPreview(){
     EasyLoginTheme {
         val navController = androidx.navigation.compose.rememberNavController()
-        LoginScreen(navController = navController)
+        SignUpScreen(navController = navController)
     }
 }
