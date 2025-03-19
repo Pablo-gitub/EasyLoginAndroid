@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.easylogin.ui.login.HomeScreen
 import com.example.easylogin.ui.login.LoginScreen
 import com.example.easylogin.ui.login.SignUpScreen
 import com.example.easylogin.ui.theme.EasyLoginTheme
@@ -37,5 +38,6 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = "login") {
         composable("login") { LoginScreen(navController = navController) }
         composable("sign-up") { SignUpScreen(navController = navController) }
+        composable("home") { HomeScreen() }
     }
 }

@@ -182,9 +182,8 @@ fun LoginScreen(navController: NavHostController){
                 Button(
                     onClick = {
                         if (loginViewModel.authenticate()) {
-
+                            navController.navigate("home")
                         }
-                        loginViewModel.authenticate()
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
@@ -214,7 +213,7 @@ fun LoginScreen(navController: NavHostController){
 
 @Preview (showBackground = true)
 @Composable
-fun LogicScreenPreview(){
+fun LoginScreenPreview(){
     EasyLoginTheme {
         val navController = androidx.navigation.compose.rememberNavController()
         LoginScreen(navController = navController)
