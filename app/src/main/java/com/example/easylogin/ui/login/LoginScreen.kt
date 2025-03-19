@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -55,7 +56,17 @@ fun LoginScreen(){
     val loginViewModel: LoginViewModel = viewModel()
     val focusManager = LocalFocusManager.current
     val passwordVisible = remember { mutableStateOf(false) }
+    val snackBarHostState = remember { androidx.compose.material3.SnackbarHostState() }
+
+    LaunchedEffect(key1 = loginViewModel.loginMessage.value) {
+        loginViewModel.loginMessage.value?.let { message ->
+            snackBarHostState.showSnackbar(message)
+            loginViewModel.loginMessage.value = null
+        }
+    }
+
     Scaffold (
+        snackbarHost = { CustomSnackbarHost(hostState = snackBarHostState, isSuccess = loginViewModel.isLoginSuccess.value) },
         topBar = {
             TopAppBar(
                 modifier = Modifier.clip(RoundedCornerShape(bottomStart = 80.dp, bottomEnd = 80.dp)),
@@ -168,9 +179,10 @@ fun LoginScreen(){
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = {
-                        if (loginViewModel.validateFields()) {
-                            
+                        if (loginViewModel.authenticate()) {
+
                         }
+                        loginViewModel.authenticate()
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(

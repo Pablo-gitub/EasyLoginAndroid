@@ -1,17 +1,21 @@
 package com.example.easylogin.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
+import com.example.easylogin.data.UserRepository
 
 class LoginViewModel : ViewModel() {
     val userName = mutableStateOf("")
     val password = mutableStateOf("")
-
+    val isLoginSuccess = mutableStateOf(false)
     val usernameError = mutableStateOf<String?>(null)
     val passwordError = mutableStateOf<String?>(null)
+    val loginMessage = mutableStateOf<String?>(null)
 
-    fun validateFields(): Boolean {
+    fun authenticate(): Boolean {
+        usernameError.value = null
+        passwordError.value = null
+        loginMessage.value = null
         var isValid = true
 
         if (userName.value.isBlank()) {
@@ -34,6 +38,20 @@ class LoginViewModel : ViewModel() {
             passwordError.value = null
         }
 
-        return isValid
+        if (!isValid) return false
+
+        return if (UserRepository.authenticate(userName.value, password.value)) {
+            loginMessage.value = "Authentication success! Welcome to easyLogin \"${userName.value}\"!"
+            isLoginSuccess.value = true
+            true
+        } else {
+            if (UserRepository.containUser(userName.value)) {
+                loginMessage.value = "Error: wrong password for user \"${userName.value}\""
+            } else {
+                loginMessage.value = "Error: user \"${userName.value}\" not found"
+            }
+            isLoginSuccess.value = false
+            false
+        }
     }
 }
