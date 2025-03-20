@@ -35,5 +35,5 @@
 
 ### Application Demo
 You can watch a demo video of the application in action:
-[![Application Demo](images/video-thumbnail.png)](images/ApplicationView.mov)
+[Watch the Application Demo](images/ApplicationView.mov)
 
